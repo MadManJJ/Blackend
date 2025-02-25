@@ -13,7 +13,6 @@ const auth = require("./routes/auth");
 
 const app = express();
 
-// body parser
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1/shop", shops);
