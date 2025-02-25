@@ -8,7 +8,6 @@ const {
   createReservation,
   updateReservation,
   deleteReservation,
-  getMyReservation,
 } = require("../controllers/reservations");
 
 // Protect is used to check if the user is logged in

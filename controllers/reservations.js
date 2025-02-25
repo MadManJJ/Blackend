@@ -15,6 +15,14 @@ exports.getReservation = async (req, res, next) => {
         message: `No reservation with the id of ${req.params.id}`,
       });
     }
+
+    if (req.user.role !== "admin" && reservation.user != req.user) {
+      return res.status(403).json({
+        success: false,
+        message: `You are not authorize to access this reservation`,
+      });
+    }
+
     res.status(200).json({ success: true, data: reservation });
   } catch (err) {
     console.log(err.stack);
