@@ -17,7 +17,7 @@ const ShopSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add a telephone number"],
       unique: true,
-      match: [/^\+?[1-9]\d{1,14}$/, "Please add a valid phone number"],
+      match: [/^\+?[0-9\s\-\(\)]{7,16}$/, "Please add a valid phone number"],
     },
     openTime: {
       type: String,
