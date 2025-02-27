@@ -127,7 +127,21 @@ exports.createShop = async (req, res, next) => {
 // @route PUT /api/v1/shops/:id
 // @access Private
 exports.updateShop = async (req, res, next) => {
-  res.status(200).json({ msg: "Shop updated successfully" });
+  try {
+    const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!shop) {
+      return res.status(404).json({ success: false });
+    }
+
+    res.status(200).json({ success: true, msg: "Update shop", data: shop });
+  } catch (err) {
+    console.log(err.stack);
+    res.status(400).json({ success: false });
+  }
 };
 
 // @desc Delete shop

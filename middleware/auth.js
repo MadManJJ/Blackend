@@ -23,6 +23,12 @@ exports.protect = async (req, res, next) => {
 
     req.user = await User.findById(decoded.id);
 
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User no longer exists" });
+    }
+
     next();
   } catch (err) {
     console.log(err.stack);
