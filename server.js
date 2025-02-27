@@ -15,7 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api/v1/shop", shops);
+app.use("/api/v1/shops", shops);
 app.use("/api/v1/reservations", reservations);
 app.use("/api/v1/auth", auth);
 
