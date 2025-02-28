@@ -30,7 +30,6 @@ rectangle "Massage Reservation System" {
     User -left-> UC7 
     User -left-> UC8 
 
-
     Admin -right-> UC3 
     Admin -right-> UC4 
     Admin -right-> UC5 

@@ -35,6 +35,15 @@ exports.login = async (req, res, next) => {
     return res.status(400).json({ success: false, msg: "Invalid credentials" });
   }
 
+  if (user.isBan) {
+    return res
+      .status(403)
+      .json({
+        success: false,
+        msg: "User is banned and cannot perform this action",
+      });
+  }
+
   const isMatch = await user.matchPassword(password);
 
   if (!isMatch) {
@@ -55,8 +64,8 @@ exports.getMe = async (req, res, next) => {
 };
 
 exports.logout = async (req, res, next) => {
-  res.cookie("token", "none", {
-    expires: new Date(Date.now() + 10 * 1000),
+  res.cookie("TOKEN", "none", {
+    expires: new Date(Date.now()),
     httpOnly: true,
   });
 
@@ -64,6 +73,65 @@ exports.logout = async (req, res, next) => {
     success: true,
     data: {},
   });
+  // res.status(200).json({ success: true });
+};
+
+exports.banUser = async (req, res, next) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: req.params.id, role: { $ne: "admin" } }, // Ensure not banning an admin
+      { isBan: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found or cannot be banned",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User banned successfully",
+      data: user,
+    });
+  } catch (err) {
+    console.error(err.stack);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+exports.unbanUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id, role: { $ne: "admin" } },
+      { isBan: false },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.stack(404).json({
+        success: false,
+        message: "User not found or cannot be unbanned",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User unbanned successfully",
+      data: user,
+    });
+  } catch (err) {
+    console.log(err.stack);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
@@ -79,9 +147,9 @@ const sendTokenResponse = (user, statusCode, res) => {
   if (process.env.NODE_ENV === "production") {
     options.secure = true;
   }
-
+  const email = user.email;
   res
     .status(statusCode)
     .cookie("token", token, options)
-    .json({ success: true, token });
+    .json({ success: true, token, email });
 };
