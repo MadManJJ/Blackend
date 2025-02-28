@@ -171,5 +171,37 @@ exports.updateReservation = async (req, res, next) => {
 // @route DELETE /api/v1/reservations/:id
 // @access -
 exports.deleteReservation = async (req, res, next) => {
-  res.status(200).json({ msg: "Reservation deleted successfully" });
+  try {
+    const reservation = await Reservation.findById(req.params.id);
+
+    if (!reservation) {
+      return res.status(404).json({
+        success: false,
+        message: `No reservation with the id of ${req.params.id}`,
+      });
+    }
+
+    // Make sure user is the reservation owner
+    if (
+      reservation.user.toString() !== req.user.id && // req.user.id come from protect
+      req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to delete this reservation`,
+      });
+    }
+
+    await reservation.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      data: {},
+    });
+  } catch (err) {
+    console.log(err.stack);
+    res
+      .status(500)
+      .json({ success: false, message: "Cannot delete Appointment" });
+  }
 };
