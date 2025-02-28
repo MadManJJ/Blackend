@@ -55,8 +55,8 @@ exports.getMe = async (req, res, next) => {
 };
 
 exports.logout = async (req, res, next) => {
-  res.cookie("token", "none", {
-    expires: new Date(Date.now() + 10 * 1000),
+  res.cookie("TOKEN", "none", {
+    expires: new Date(Date.now()),
     httpOnly: true,
   });
 
@@ -80,8 +80,10 @@ const sendTokenResponse = (user, statusCode, res) => {
     options.secure = true;
   }
 
+  const email = user.email;
+
   res
     .status(statusCode)
     .cookie("token", token, options)
-    .json({ success: true, token });
+    .json({ success: true, token, email });
 };
