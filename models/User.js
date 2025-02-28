@@ -39,6 +39,11 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isBan: {
+    type: Boolean,
+    required: [true, "Please specify if the user is banned"],
+    default: false, // Default to false, meaning not banned
+  },
 });
 
 // UserSchema.virtual("reservations", {

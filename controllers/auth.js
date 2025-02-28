@@ -35,6 +35,13 @@ exports.login = async (req, res, next) => {
     return res.status(400).json({ success: false, msg: "Invalid credentials" });
   }
 
+  if (user.isBan) {
+    return res.status(403).json({
+      success: false,
+      msg: "User is banned and cannot perform this action",
+    });
+  }
+
   const isMatch = await user.matchPassword(password);
 
   if (!isMatch) {
@@ -55,15 +62,74 @@ exports.getMe = async (req, res, next) => {
 };
 
 exports.logout = async (req, res, next) => {
-  res.cookie("TOKEN", "none", {
-    expires: new Date(Date.now()),
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 5 * 1000),
     httpOnly: true,
+    path: "/",
   });
+  // console.log(Date.now());
 
   res.status(200).json({
     success: true,
-    data: {},
   });
+};
+
+exports.banUser = async (req, res, next) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: req.params.id, role: { $ne: "admin" } }, // Ensure not banning an admin
+      { isBan: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found or cannot be banned",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User banned successfully",
+      data: user,
+    });
+  } catch (err) {
+    console.error(err.stack);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+exports.unbanUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id, role: { $ne: "admin" } },
+      { isBan: false },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.stack(404).json({
+        success: false,
+        message: "User not found or cannot be unbanned",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User unbanned successfully",
+      data: user,
+    });
+  } catch (err) {
+    console.log(err.stack);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
 
 const sendTokenResponse = (user, statusCode, res) => {

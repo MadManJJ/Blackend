@@ -23,6 +23,13 @@ exports.protect = async (req, res, next) => {
 
     req.user = await User.findById(decoded.id);
 
+    if (req.user.isBan) {
+      return res.status(403).json({
+        success: false,
+        message: "User is banned and cannot perform this action",
+      });
+    }
+
     if (!req.user) {
       return res
         .status(401)
