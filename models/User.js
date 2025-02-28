@@ -31,10 +31,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please add a telephone number"],
     unique: true,
-    match: [
-      /^(?:\+?[1-9]\d{1,14}|0\d{9,14})$/,
-      "Please add a valid phone number",
-    ], // Allows starting with 0 or + and followed by digits
+    match: [/^\+?[0-9\s\-\(\)]{7,16}$/, "Please add a valid phone number"], // Allows starting with 0 or + and followed by digits
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
