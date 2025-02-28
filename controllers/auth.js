@@ -46,6 +46,10 @@ exports.login = async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 };
 
+// Get current logged in user @route POST /api/v1/auth/me @access Private
 exports.getMe = async (req, res, next) => {
-  res.status(200).json({ msg: "User details retrieved successfully" });
+  // use after authmiddleware 'protect'
+  // console.log(req.user);
+  const user = await User.findById(req.user._id); // come from req.user = await User.findById(decoded.id); inside protect
+  res.status(200).json({ success: true, data: user });
 };
