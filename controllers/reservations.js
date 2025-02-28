@@ -88,7 +88,41 @@ exports.getReservations = async (req, res, next) => {
 // @route POST /api/v1/reservations/
 // @access -
 exports.createReservation = async (req, res, next) => {
-  res.status(201).json({ msg: "Reservation created successfully" });
+  try {
+    req.body.shop = req.params.shopId; // so that it can populate later (we use req.body to create appointment  )
+
+    const shop = await Shop.findById(req.params.shopId);
+
+    if (!shop) {
+      return res.status(404).json({
+        success: false,
+        message: `No shop with the id of ${req.params.shopId}`,
+      });
+    }
+    console.log(req.body);
+
+    // add user Id to req.body
+    req.body.user = req.user.id; // req.user.id come from the middleware protect
+
+    // Check for existed appointment
+    const existedReservation = await Reservation.find({ user: req.user.id });
+
+    // If the user is not an admin, they can only create 3 appointment
+    if (existedReservation.length >= 3 && req.user.role !== "admin") {
+      return res.status(400).json({
+        success: false,
+        message: `The user with ID ${req.user.id} has already made 3 reservation`,
+      });
+    }
+    const reservation = await Reservation.create(req.body);
+
+    res.status(201).json({ success: true, data: reservation });
+  } catch (err) {
+    console.log(err.stack);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find Reservation" });
+  }
 };
 
 // @desc Update reservation
