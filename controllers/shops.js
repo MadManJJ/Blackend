@@ -1,6 +1,6 @@
 const Shop = require("../models/Shop");
 // @desc Get one shop
-// @route GET /api/v1/shop/
+// @route GET /api/v1/shops/:id
 // @access Public
 exports.getShop = async (req, res, next) => {
   try {
@@ -9,7 +9,9 @@ exports.getShop = async (req, res, next) => {
       select: "date -shop -_id",
     });
     if (!shop) {
-      return res.status(400).json({ success: false });
+      return res
+        .status(400)
+        .json({ success: false, message: "Cannot find shop with provided ID" });
     }
     res.status(200).json({
       success: true,
@@ -18,13 +20,13 @@ exports.getShop = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err.stack);
-    res.status(400).json({ success: false });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
 // @desc Get all shops
-// @route GET /api/v1/shop/:id
-// @access -
+// @route GET /api/v1/shops/
+// @access Public
 exports.getShops = async (req, res, next) => {
   let query;
 
@@ -110,12 +112,12 @@ exports.getShops = async (req, res, next) => {
 };
 
 // @desc Create shop
-// @route POST /api/v1/shop/
-// @access -
+// @route POST /api/v1/shops/
+// @access Private
 exports.createShop = async (req, res, next) => {
   try {
     const shop = await Shop.create(req.body);
-    res.status(200).json({ success: true, msg: "Create shop", data: shop });
+    res.status(201).json({ success: true, msg: "Create shop", data: shop });
   } catch (err) {
     console.log(err.stack);
     res.status(400).json({ success: false });
@@ -124,7 +126,7 @@ exports.createShop = async (req, res, next) => {
 
 // @desc Update shop
 // @route PUT /api/v1/shop/:id
-// @access -
+// @access Private
 exports.updateShop = async (req, res, next) => {
   try {
     const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
@@ -144,8 +146,8 @@ exports.updateShop = async (req, res, next) => {
 };
 
 // @desc Delete shop
-// @route DELETE /api/v1/shop/:id
-// @access -
+// @route DELETE /api/v1/shops/:id
+// @access Private
 exports.deleteShop = async (req, res, next) => {
   try {
     const shop = await Shop.findById(req.params.id);
@@ -157,7 +159,7 @@ exports.deleteShop = async (req, res, next) => {
       });
     }
 
-    await Shop.deleteMany({ _id: req.params.id });
+    await Shop.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true, message: "Delete shop", data: {} });
   } catch (err) {
     console.log(err.stack);

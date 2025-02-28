@@ -2,7 +2,7 @@ const Reservation = require("../models/Reservation");
 const Shop = require("../models/Shop");
 // @desc Get one reservations
 // @route GET /api/v1/reservations/:id
-// @access -
+// @access Private
 exports.getReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
@@ -32,7 +32,7 @@ exports.getReservation = async (req, res, next) => {
 
 // @desc Get all reservations
 // @route GET /api/v1/reservations/
-// @access -
+// @access Private
 exports.getReservations = async (req, res, next) => {
   let query;
 
@@ -85,7 +85,7 @@ exports.getReservations = async (req, res, next) => {
 
 // @desc Create reservations
 // @route POST /api/v1/reservations/
-// @access -
+// @access Private
 exports.createReservation = async (req, res, next) => {
   try {
     req.body.shop = req.params.shopId; // so that it can populate later (we use req.body to create appointment  )
@@ -126,7 +126,7 @@ exports.createReservation = async (req, res, next) => {
 
 // @desc Update reservations
 // @route PUT /api/v1/reservations/:id
-// @access -
+// @access Private
 exports.updateReservation = async (req, res, next) => {
   try {
     let reservation = await Reservation.findById(req.params.id);
@@ -168,7 +168,7 @@ exports.updateReservation = async (req, res, next) => {
 
 // @desc Delete reservations
 // @route DELETE /api/v1/reservations/:id
-// @access -
+// @access Private
 exports.deleteReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
