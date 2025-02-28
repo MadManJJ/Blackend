@@ -53,3 +53,15 @@ exports.getMe = async (req, res, next) => {
   const user = await User.findById(req.user._id); // come from req.user = await User.findById(decoded.id); inside protect
   res.status(200).json({ success: true, data: user });
 };
+
+exports.logout = async (req, res, next) => {
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
+};
