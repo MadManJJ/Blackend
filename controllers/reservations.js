@@ -5,29 +5,52 @@ const Shop = require("../models/Shop");
 // @route GET /api/v1/reservations/:id
 // @access -
 exports.getReservation = async (req, res, next) => {
+  let query;
+
+  if (req.user.role !== "admin") {
+    // If user is not an admin, then they can only see their appointment
+    if (req.params.shopId) {
+      query = Reservation.find({
+        user: req.user.id,
+        shop: req.params.shopId,
+      }).populate({
+        path: "shop",
+        select: "name province tel",
+      });
+    } else {
+      query = Reservation.find({ user: req.user.id }).populate({
+        path: "shop",
+        select: "name province tel",
+      });
+    }
+  } else {
+    // If user is an admin, then user can see all
+    if (req.params.shopId) {
+      console.log(req.params.shopId);
+      query = Reservation.find({ shop: req.params.shopId }).populate({
+        path: "shop",
+        select: "name address telephone openTime closeTime",
+      });
+    } else {
+      query = Reservation.find().populate({
+        path: "shop",
+        select: "name address telephone openTime closeTime",
+      });
+    }
+  }
+
   try {
-    const reservation = await Reservation.findById(req.params.id).populate({
-      path: "shop",
-      select: "-_id",
+    const reservation = await query;
+    res.status(200).json({
+      success: false,
+      count: reservation.length,
+      data: reservation,
     });
-    if (!reservation) {
-      return res.status(404).json({
-        success: false,
-        message: `No reservation with the id of ${req.params.id}`,
-      });
-    }
-
-    if (req.user.role !== "admin" && reservation.user != req.user) {
-      return res.status(403).json({
-        success: false,
-        message: `You are not authorize to access this reservation`,
-      });
-    }
-
-    res.status(200).json({ success: true, data: reservation });
   } catch (err) {
     console.log(err.stack);
-    res.status(500).json({ success: false, msg: "Cannot get reservation" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find Reservation" });
   }
 };
 
