@@ -148,5 +148,20 @@ exports.updateShop = async (req, res, next) => {
 // @route DELETE /api/v1/shops/:id
 // @access Private
 exports.deleteShop = async (req, res, next) => {
-  res.status(200).json({ msg: "Shop deleted successfully" });
+  try {
+    const shop = await Shop.findById(req.params.id);
+
+    if (!shop) {
+      return res.status(404).json({
+        success: false,
+        message: `Shop not found with id of ${req.params.id}`,
+      });
+    }
+
+    await Shop.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: "Delete shop", data: {} });
+  } catch (err) {
+    console.log(err.stack);
+    res.status(400).json({ success: false });
+  }
 };
