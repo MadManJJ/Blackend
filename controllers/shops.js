@@ -1,5 +1,4 @@
 const Shop = require("../models/Shop");
-
 // @desc Get one shop
 // @route GET /api/v1/shops/:id
 // @access Public
@@ -10,7 +9,9 @@ exports.getShop = async (req, res, next) => {
       select: "date -shop -_id",
     });
     if (!shop) {
-      return res.status(400).json({ success: false });
+      return res
+        .status(400)
+        .json({ success: false, message: "Cannot find shop with provided ID" });
     }
     res.status(200).json({
       success: true,
@@ -19,7 +20,7 @@ exports.getShop = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err.stack);
-    res.status(400).json({ success: false });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -116,7 +117,7 @@ exports.getShops = async (req, res, next) => {
 exports.createShop = async (req, res, next) => {
   try {
     const shop = await Shop.create(req.body);
-    res.status(200).json({ success: true, msg: "Create shop", data: shop });
+    res.status(201).json({ success: true, msg: "Create shop", data: shop });
   } catch (err) {
     console.log(err.stack);
     res.status(400).json({ success: false });
