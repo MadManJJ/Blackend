@@ -36,12 +36,10 @@ exports.login = async (req, res, next) => {
   }
 
   if (user.isBan) {
-    return res
-      .status(403)
-      .json({
-        success: false,
-        msg: "User is banned and cannot perform this action",
-      });
+    return res.status(403).json({
+      success: false,
+      msg: "User is banned and cannot perform this action",
+    });
   }
 
   const isMatch = await user.matchPassword(password);
