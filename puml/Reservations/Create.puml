@@ -13,7 +13,7 @@ participant "<<model>>\n:Shop" as modelShop
 database "<<MongoDB>>\n:ReservationsDatabase" as ReservationsDatabase
 database "<<MongoDB>>\n:ShopsDatabase" as ShopsDatabase
 
-client->server ++:req.post('/api/v1/reservations')
+client->server ++:req.post('/api/v1/:shopId/reservations/')
 server->routerReservations ++:router.post('/', protect, authorize('admin', 'user'), createReservation)
 routerReservations -> controllersReservations ++:createReservation()
 controllersReservations->modelShop ++:findById(req.params.shopId)
