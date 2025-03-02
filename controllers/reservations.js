@@ -121,7 +121,7 @@ exports.createReservation = async (req, res, next) => {
     console.log(err.stack);
     return res
       .status(500)
-      .json({ success: false, message: "Cannot find Reservation" });
+      .json({ success: false, message: "Cannot create Reservation" });
   }
 };
 
