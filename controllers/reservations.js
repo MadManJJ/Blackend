@@ -38,7 +38,7 @@ exports.getReservations = async (req, res, next) => {
   let query;
 
   if (req.user.role !== "admin") {
-    // If user is not an admin, then they can only see their appointment
+    // If user is not an admin, then they can only see their reservation
     if (req.params.shopId) {
       query = Reservation.find({
         user: req.user.id,
@@ -89,7 +89,7 @@ exports.getReservations = async (req, res, next) => {
 // @access Private
 exports.createReservation = async (req, res, next) => {
   try {
-    req.body.shop = req.params.shopId; // so that it can populate later (we use req.body to create appointment  )
+    req.body.shop = req.params.shopId; // so that it can populate later (we use req.body to create reservation  )
 
     const shop = await Shop.findById(req.params.shopId);
 
@@ -104,10 +104,10 @@ exports.createReservation = async (req, res, next) => {
     // add user Id to req.body
     req.body.user = req.user.id; // req.user.id come from the middleware protect
 
-    // Check for existed appointment
+    // Check for existed reservation
     const existedReservation = await Reservation.find({ user: req.user.id });
 
-    // If the user is not an admin, they can only create 3 appointment
+    // If the user is not an admin, they can only create 3 reservation
     if (existedReservation.length >= 3 && req.user.role !== "admin") {
       return res.status(400).json({
         success: false,
@@ -202,6 +202,6 @@ exports.deleteReservation = async (req, res, next) => {
     console.log(err.stack);
     res
       .status(500)
-      .json({ success: false, message: "Cannot delete Appointment" });
+      .json({ success: false, message: "Cannot delete Reservation" });
   }
 };

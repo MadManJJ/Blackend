@@ -81,7 +81,6 @@ exports.getShops = async (req, res, next) => {
     query = query.skip(startIndex).limit(limit);
 
     const shop = await query;
-    // console.log(hospital);
 
     // Pagination result
     const pagination = {}; // have next and prev (give the next page and prev page)
