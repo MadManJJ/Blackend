@@ -5,12 +5,13 @@ skinparam stereotype {
 }
 
 package "Routes" {
-  class UserRoutes <<Route>> {
-    +GET /users
-    +GET /users/{id}
-    +POST /users
-    +PUT /users/{id}
-    +DELETE /users/{id}
+  class AuthRoutes <<Route>> {
+    +POST /register
+    +POST /login
+    +GET /getme
+    +PUT /ban/{id}
+    +PUT /unban/{id}
+    +GET /logout
   }
   
   class ShopRoutes <<Route>> {
@@ -31,12 +32,13 @@ package "Routes" {
 }
 
 package "Controllers" {
-  class UserController <<Controller>> {
-    +getUsers(): User[]
-    +getUser(id: int): User
-    +createUser(user: User): User
-    +updateUser(id: int, user: User): User
-    +deleteUser(id: int): void
+  class AuthController <<Controller>> {
+    +register(): User
+    +login(): User
+    +getMe(): User
+    +logout(): void
+    +banUser(id: int): User
+    +unbanUser(id: int): User
   }
 
   class ShopController <<Controller>> {
@@ -99,11 +101,11 @@ package "Models" {
   }
 }
 
-UserRoutes --> UserController : "invokes"
+AuthRoutes --> AuthController : "invokes"
 ShopRoutes --> ShopController : "invokes"
 ReservationRoutes --> ReservationController : "invokes"
 
-UserController --> User : "manages"
+AuthController --> User : "manages"
 ShopController --> Shop : "manages"
 ReservationController --> Reservation : "manages"
 

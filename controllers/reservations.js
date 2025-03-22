@@ -205,3 +205,38 @@ exports.deleteReservation = async (req, res, next) => {
       .json({ success: false, message: "Cannot delete Reservation" });
   }
 };
+
+exports.deleteOrphanReservations = async (req, res, next) => {
+  try {
+    // Aggregation to find orphan reservations
+    const orphanReservations = await Reservation.aggregate([
+      {
+        $lookup: {
+          from: "shops",
+          localField: "shop",
+          foreignField: "_id",
+          as: "shopdata"
+        }
+      },
+      {
+        $match: {
+          shopdata: { $size: 0 }
+        }
+      }
+    ]);
+
+    const orphanReservationIds = orphanReservations.map(reservation => reservation._id);
+
+    // Delete the orphan reservations
+    if (orphanReservationIds.length > 0) {
+      const result = await Reservation.deleteMany({
+        _id: { $in: orphanReservationIds }
+      });
+      console.log(`${result.deletedCount} orphaned reservations deleted.`);
+    } else {
+      console.log("No orphaned reservations found.");
+    }
+  } catch (err) {
+    console.error("Error deleting orphan reservations:", err);
+  }
+}

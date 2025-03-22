@@ -1,4 +1,6 @@
 const Shop = require("../models/Shop");
+const Reservation = require("../models/Reservation");
+
 // @desc Get one shop
 // @route GET /api/v1/shops/:id
 // @access Public
@@ -157,7 +159,7 @@ exports.deleteShop = async (req, res, next) => {
         message: `Shop not found with id of ${req.params.id}`,
       });
     }
-
+    await Reservation.deleteMany({shop: shop.id})
     await Shop.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true, message: "Delete shop", data: {} });
   } catch (err) {
@@ -165,3 +167,5 @@ exports.deleteShop = async (req, res, next) => {
     res.status(400).json({ success: false });
   }
 };
+
+

@@ -8,7 +8,10 @@ const {
   createReservation,
   updateReservation,
   deleteReservation,
+  deleteOrphanReservations
 } = require("../controllers/reservations");
+
+// router.delete("/deleteOrphan", protect, authorize("admin"), deleteOrphanReservations); 
 
 // Protect is used to check if the user is logged in
 // authorize checks if the user has the required role

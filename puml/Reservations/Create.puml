@@ -23,10 +23,24 @@ ShopsDatabase --> modelShop --: Shop Data
 alt Shop Found
   modelShop --> controllersReservations --: Shop Data
   controllersReservations->modelReservation ++:find({ user: req.user.id })
+  modelReservation -> ReservationsDatabase ++: Query Reservations by User ID
+  ReservationsDatabase --> modelReservation --: Reservation Data
 
-  alt Reservation Limit Exceeded
-    controllersReservations->client --: { success: false, message: "User has already made 3 reservations" }
-  else Reservation Limit Not Exceeded
+  alt Reservations Found
+    alt User is Admin
+      controllersReservations->modelReservation ++:create(req.body)
+      modelReservation -> ReservationsDatabase ++: Insert Reservation
+      ReservationsDatabase --> modelReservation --: New Reservation
+      controllersReservations->client --: { success: true, data: reservation }
+    else Reservation Limit Exceeded
+      controllersReservations->client --: { success: false, message: "User has already made 3 reservations" }
+    else Reservation Limit Not Exceeded
+      controllersReservations->modelReservation ++:create(req.body)
+      modelReservation -> ReservationsDatabase ++: Insert Reservation
+      ReservationsDatabase --> modelReservation --: New Reservation
+      controllersReservations->client --: { success: true, data: reservation }
+    end alt
+  else No Existing Reservations
     controllersReservations->modelReservation ++:create(req.body)
     modelReservation -> ReservationsDatabase ++: Insert Reservation
     ReservationsDatabase --> modelReservation --: New Reservation
