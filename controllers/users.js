@@ -6,7 +6,7 @@ const User = require("../models/User");
 exports.getUsers = async (req, res, next) => {
   try {
     const user = await User.find();
-    res.status(200).json({ success: true, count: user.length, data: user });
+    res.status(200).json({ success: true, msg:'Get All Users Successful', count: user.length, data: user });
   } catch (err) {
     console.log(err.stack);
     res.status(400).json({ success: false, msg: "Can not get all Users" });
@@ -22,8 +22,8 @@ exports.getUser = async (req, res, next) => {
 
     if (!user) {
       return res
-        .status(400)
-        .json({ success: false, message: "Cannot find shop with provided ID" });
+        .status(404)
+        .json({ success: false, message: "Cannot find User with provided ID" });
     }
 
     if (req.user != user && req.user.role !== "admin") {
@@ -35,9 +35,27 @@ exports.getUser = async (req, res, next) => {
         });
     }
 
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({ success: true, msg:'Get User Successful', data: user });
   } catch (err) {
     console.log(err.stack);
     res.status(400).json({ success: false, msg: "Can not get all Users" });
   }
 };
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if(!user){
+      return res
+        .status(404)
+        .json({ success: false, message: "Cannot find User with provided ID" });
+    }
+
+    res.status(200).json({ success: true, msg:'Delete successful', data: user });
+    
+  } catch (err) {
+    console.log(err.stack);
+    res.status(400).json({ success: false, msg: "Can not delete this User" });
+  }
+}
