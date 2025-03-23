@@ -42,6 +42,9 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
+// @desc Delete User
+// @route DELETE /api/v1/user/:id
+// @access Private
 exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
