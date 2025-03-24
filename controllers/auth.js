@@ -148,9 +148,10 @@ const sendTokenResponse = (user, statusCode, res) => {
 
   const role = user.role;
   const email = user.email;
+  const name = user.name;
 
   res
     .status(statusCode)
     .cookie("token", token, options)
-    .json({ success: true, token, email, role });
+    .json({ success: true, token, email, role, name });
 };
